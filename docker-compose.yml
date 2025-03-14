@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: eventos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tusdatos**
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:Tusdatos**@db/eventos_db
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:
