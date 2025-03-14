@@ -1,0 +1,136 @@
+-- Table: public.users
+
+-- DROP TABLE IF EXISTS public.users;
+
+CREATE SEQUENCE users_id_seq START 1;
+
+
+CREATE TABLE IF NOT EXISTS public.users
+(
+    id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+    email character varying COLLATE pg_catalog."default",
+    password character varying COLLATE pg_catalog."default",
+    token character varying(255) COLLATE pg_catalog."default",
+    createdby integer,
+    rol character varying(50) COLLATE pg_catalog."default" DEFAULT 'Asistente'::character varying,
+    name character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.users
+    OWNER to postgres;
+-- Index: ix_users_email
+
+-- DROP INDEX IF EXISTS public.ix_users_email;
+
+CREATE UNIQUE INDEX IF NOT EXISTS ix_users_email
+    ON public.users USING btree
+    (email COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: ix_users_id
+
+-- DROP INDEX IF EXISTS public.ix_users_id;
+
+CREATE INDEX IF NOT EXISTS ix_users_id
+    ON public.users USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Table: public.events
+
+-- DROP TABLE IF EXISTS public.events;
+CREATE SEQUENCE events_id_seq START 1;
+
+CREATE TABLE IF NOT EXISTS public.events
+(
+    id integer NOT NULL DEFAULT nextval('events_id_seq'::regclass),
+    name character varying COLLATE pg_catalog."default",
+    capacity integer,
+    owner_id integer,
+    created_at timestamp without time zone,
+    event_date timestamp without time zone,
+    address character varying(255) COLLATE pg_catalog."default",
+    status character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT events_pkey PRIMARY KEY (id),
+    CONSTRAINT events_owner_id_fkey FOREIGN KEY (owner_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.events
+    OWNER to postgres;
+-- Index: ix_events_id
+
+-- DROP INDEX IF EXISTS public.ix_events_id;
+
+CREATE INDEX IF NOT EXISTS ix_events_id
+    ON public.events USING btree
+    (id ASC NULLS LAST)
+    TABLESPACE pg_default;
+-- Index: ix_events_name
+
+-- DROP INDEX IF EXISTS public.ix_events_name;
+
+CREATE INDEX IF NOT EXISTS ix_events_name
+    ON public.events USING btree
+    (name COLLATE pg_catalog."default" ASC NULLS LAST)
+    TABLESPACE pg_default;
+
+-- Table: public.attendees
+
+-- DROP TABLE IF EXISTS public.attendees;
+CREATE SEQUENCE attendees_id_seq START 1;
+
+CREATE TABLE IF NOT EXISTS public.attendees
+(
+    id integer NOT NULL DEFAULT nextval('attendees_id_seq'::regclass),
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    email character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    event_id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT attendees_pkey PRIMARY KEY (id),
+    CONSTRAINT attendees_event_id_fkey FOREIGN KEY (event_id)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.attendees
+    OWNER to postgres;
+
+-- Table: public.speakers
+
+-- DROP TABLE IF EXISTS public.speakers;
+CREATE SEQUENCE speakers_id_seq START 1;
+
+
+CREATE TABLE IF NOT EXISTS public.speakers
+(
+    id integer NOT NULL DEFAULT nextval('speakers_id_seq'::regclass),
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    event_id integer NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    description text COLLATE pg_catalog."default",
+    CONSTRAINT speakers_pkey PRIMARY KEY (id),
+    CONSTRAINT speakers_event_id_fkey FOREIGN KEY (event_id)
+        REFERENCES public.events (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.speakers
+    OWNER to postgres;
+
+
+INSERT INTO public.users(
+	 email, password, rol, name)
+	VALUES ( 'admin@admin.com', '"$2b$12$P2f9dBweY4Qv96uPPLq9T.PWjorcxmFpa6k4bA/fwh3vb3ALxUn8O"', 'Admin', 'Administrador Mis Eventos');

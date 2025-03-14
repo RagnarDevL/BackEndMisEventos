@@ -14,19 +14,21 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ../BackEndMisEventos
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://postgres:Tusdatos**@db/eventos_db
+      DATABASE_URL: postgresql://postgres:Tusdatos**@db/eventos_db
 
   frontend:
     build:
-      context: ./frontend
+      context: ../../frontend/FrontendMisEventos
     ports:
       - "8080:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
